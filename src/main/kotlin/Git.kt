@@ -102,9 +102,16 @@ class Git {
     fun listCommits() = commits
 
     /**
-     * Finds commit by hash
-     * @param hash Hash of commit
+     * Finds latest commit by predicate
+     * @param predicate Search predicate
      * @return Commit object or null if not found
      */
-    fun findCommitByHash(hash: String) = commits.find { it.hash == hash }
+    fun findCommit(predicate: (Commit) -> Boolean) = commits.sortedBy { it.time }.find(predicate)
+
+    /**
+     * Finds all commits by predicate
+     * @param predicate Search predicate
+     * @return List of commits
+     */
+    fun findCommits(predicate: (Commit) -> Boolean) = commits.filter(predicate)
 }
