@@ -92,7 +92,7 @@ class Git {
             throw IllegalStateException("Tree is empty, nothing to commit.")
 
         commits.add(Commit(commitTree!!, author, message))
-        commitTree = null;
+        commitTree = null
     }
 
     /**
