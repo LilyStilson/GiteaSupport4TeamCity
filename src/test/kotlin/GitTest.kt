@@ -58,4 +58,17 @@ class GitTest {
         assert(commits[0].message == "Initial commit")
         assert(tree == commits[0].tree)
     }
+
+    @Test
+    fun testHashes() {
+        val blob1 = Blob("Hello, world!")
+        val blob2 = Blob("Hello, world!")
+        assert(blob1.hash == blob2.hash)
+
+        val tree1 = Tree()
+        tree1.entries["file.txt"] = Either.Left(blob1)
+        val tree2 = Tree()
+        tree2.entries["file.txt"] = Either.Left(blob2)
+        assert(tree1.hash == tree2.hash)
+    }
 }

@@ -14,7 +14,7 @@ sealed class Either<out A, out B> {
 
 
 data class Blob(val data: String) {
-    val hash = calcHash(data);
+    val hash = calcHash(data)
 }
 
 data class Tree(val entries: MutableMap<String, Either<Blob, Tree>> = mutableMapOf()) {
@@ -37,4 +37,4 @@ class Git {
     fun findCommitByHash(hash: String) = commits.find { it.hash == hash }
 }
 
-fun main(args: Array<String>) { }
+fun main() { }
