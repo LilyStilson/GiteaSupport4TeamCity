@@ -1,3 +1,5 @@
+package org.nightskystudio.git
+
 import java.security.MessageDigest
 import java.time.LocalDateTime
 
@@ -10,6 +12,11 @@ fun calcHash(data: String): String =
     MessageDigest.getInstance("SHA-1")
         .digest(data.toByteArray())
         .joinToString("") { "%02x".format(it) }
+
+/**
+ * Git exception wrapper
+ */
+class GitException(message: String) : Exception(message)
 
 /**
  * Represents either left or right value
@@ -49,7 +56,8 @@ data class Tree(val entries: MutableMap<String, Either<Blob, Tree>> = mutableMap
  * @property hash Hash of commit
  *
  */
-data class Commit(val tree: Tree, val author: String, val message: String, val time: LocalDateTime = LocalDateTime.now()) {
+data class Commit(val tree: Tree, val author: String, val message: String,
+                  val time: LocalDateTime = LocalDateTime.now()) {
     val hash = calcHash("$tree$author$message$time")
 }
 
@@ -61,6 +69,7 @@ data class Commit(val tree: Tree, val author: String, val message: String, val t
  */
 class Git {
     private val commits = mutableListOf<Commit>()
+
     /**
      * Unless tree is not specified in addFiles and commit methods,
      * this tree will be used
@@ -68,12 +77,27 @@ class Git {
     private var commitTree: Tree? = null
 
     /**
+     * Checks if files are already in tree
+     * @param tree Tree to check
+     * @param files Map of files to check
+     * @return True if files are in tree, false otherwise
+     */
+    private fun filesAreInTree(tree: Tree, files: Map<String, Either<Blob, Tree>>): Boolean {
+        val sameKey = tree.entries.any { files.containsKey(it.key) }
+        val sameBlob = tree.entries.values.any { files.containsValue(it) }
+        return sameKey && sameBlob;
+    }
+
+    /**
      * Adds files to commit tree
      * @param tree Tree to add files to
      * @param files Map of files to add
+     * @throws GitException if tree already exists in commits
      */
     fun addFiles(tree: Tree? = null, files: Map<String, Either<Blob, Tree>>) {
-        commitTree = tree ?: Tree()
+        commitTree = tree ?: commitTree ?: Tree()
+        if (filesAreInTree(commitTree!!, files))
+            throw GitException("No changes were detected or this item already exists.")
         commitTree!!.entries.putAll(files)
     }
 
@@ -83,13 +107,13 @@ class Git {
      * @param author Author of commit
      * @param message Commit message
      * @return Commit object
-     * @throws IllegalStateException if tree is empty
+     * @throws GitException if tree is empty
      */
     fun commit(tree: Tree? = null, author: String, message: String) {
         if (commitTree == null) commitTree = tree ?: Tree()
 
         if (commitTree!!.entries.isEmpty())
-            throw IllegalStateException("Tree is empty, nothing to commit.")
+            throw GitException("Tree is empty, nothing to commit.")
 
         commits.add(Commit(commitTree!!, author, message))
         commitTree = null
