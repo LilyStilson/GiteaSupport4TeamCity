@@ -1,10 +1,14 @@
 # Gitea support for TeamCity
-### Test task for internship application
+*Test task for internship application*
 
 ## Description
 For the sake of simplicity, this is not a proper *library* implementation. 
 It's a mix of package and application. `package` declaration in `Git.kt` 
 will show a warning of incorrect path.
+
+## Tests
+The only untested file is `Main.kt`, everything else has 100% coverage.
+![image](https://github.com/LilyStilson/GiteaSupport4TeamCity/assets/42270214/6fdc87e5-9037-46db-96a3-fdc15b493414)
 
 ## Usage
 ```kotlin
