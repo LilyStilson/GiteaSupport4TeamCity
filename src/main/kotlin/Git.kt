@@ -85,7 +85,7 @@ class Git {
     private fun filesAreInTree(tree: Tree, files: Map<String, Either<Blob, Tree>>): Boolean {
         val sameKey = tree.entries.any { files.containsKey(it.key) }
         val sameBlob = tree.entries.values.any { files.containsValue(it) }
-        return sameKey && sameBlob;
+        return sameKey && sameBlob
     }
 
     /**
