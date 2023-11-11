@@ -1,3 +1,5 @@
+package org.nightskystudio.git
+
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 
@@ -55,7 +57,7 @@ class GitTest {
         git.addFiles(files = mapOf("file.txt" to Either.Left(Blob("Hello, world!"))))
         git.commit(author = "Jan Novak", message = "Initial commit")
 
-        git.addFiles(files = mapOf("file.txt" to Either.Left(Blob("Hello, world!"))))
+        git.addFiles(files = mapOf("file.txt" to Either.Left(Blob("Hello, world!!~!"))))
         git.commit(author = "Jan Novak", message = "2nd commit")
 
         val commits = git.listCommits()
@@ -83,11 +85,11 @@ class GitTest {
     fun testCatchEmptyTree() {
         val git = Git()
 
-        assertThrows<IllegalStateException> {
+        assertThrows<GitException> {
             git.commit(Tree(), "Jan Novak", "Initial commit")
         }
 
-        assertThrows<IllegalStateException> {
+        assertThrows<GitException> {
             git.commit(author = "Jan Novak", message = "Initial commit")
         }
     }
@@ -120,7 +122,7 @@ class GitTest {
         }
 
         git.addFiles(files = mapOf(
-            "blob1" to Either.Left(Blob("Hello, world!")),
+            "blob1" to Either.Left(Blob("Hello, world")),
         ))
         git.commit(author = "Konstantin R.", message = "What?")
 
@@ -130,5 +132,26 @@ class GitTest {
         val search2 = git.findCommit { it.message == "What?" }
         assert(search2 != null)
         assert(search2!!.author == "Konstantin R.")
+    }
+
+    @Test
+    fun testDuplicateTree() {
+        val git = Git()
+
+        git.addFiles(files = mapOf("file.txt" to Either.Left(Blob("Hello, world!"))))
+        assertThrows<GitException> {
+            git.addFiles(files = mapOf("file.txt" to Either.Left(Blob("Hello, world!"))))
+        }
+        git.commit(author = "Jan Novak", message = "Initial commit")
+
+        var commits = git.listCommits()
+        assert(commits.size == 1)
+        assert(commits[0].tree.entries.size == 1)
+
+        git.addFiles(files = mapOf("file.txt" to Either.Left(Blob("Hello, world!"))))
+        git.commit(author = "Jan Novak", message = "Initial commit")
+
+        commits = git.listCommits()
+        assert(commits.size == 2)
     }
 }
