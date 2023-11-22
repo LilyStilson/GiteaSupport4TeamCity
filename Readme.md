@@ -1,5 +1,4 @@
 # Gitea support for TeamCity
-*Test task for internship application*
 
 ## Description
 For the sake of simplicity, this is not a proper *library* implementation. 
